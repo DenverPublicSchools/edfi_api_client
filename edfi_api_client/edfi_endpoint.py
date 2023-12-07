@@ -86,7 +86,7 @@ class EdFiEndpoint:
         return res
 
 
-    def get(self, limit: Optional[int] = None) -> List[dict]:
+    def get(self, limit: Optional[int] = None, **kwparams) -> List[dict]:
         """
         This method returns the rows from a single GET request using the exact params passed by the user.
 
@@ -96,6 +96,9 @@ class EdFiEndpoint:
 
         if limit is not None:
             params['limit'] = limit
+
+        for key, value in kwparams.items():
+            params[key] = value
 
         return self._get_response(self.url, params=params).json()
 
@@ -384,7 +387,7 @@ class EdFiResource(EdFiEndpoint):
         )
 
 
-    def get(self, limit: Optional[int] = None):
+    def get(self, limit: Optional[int] = None, **kwparams):
         """
         This method returns the rows from a single GET request using the exact params passed by the user.
 
@@ -394,7 +397,7 @@ class EdFiResource(EdFiEndpoint):
             f"[Get Resource] Endpoint  : {self.url}\n"
             f"[Get Resource] Parameters: {self.params}"
         )
-        return super().get(limit)
+        return super().get(limit, **kwparams)
 
 
     def get_pages(self,

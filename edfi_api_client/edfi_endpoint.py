@@ -101,6 +101,18 @@ class EdFiEndpoint:
             params[key] = value
 
         return self._get_response(self.url, params=params).json()
+    
+
+    def put(self, resourceId: str, body: dict) -> List[dict]:
+        """
+        This method returns the result from a single PUT request using the parameters and body passed by the user.
+        PUT request results are usually only a status 204
+
+        :return:
+        """
+        params = self.params.copy()
+        
+        return self._put_response(f"{self.url}/{resourceId}", params=params, body=body)
 
 
     def get_rows(self,
@@ -282,6 +294,17 @@ class EdFiEndpoint:
             raise RuntimeError(
                 "API GET failed: max retries exceeded for URL."
             )
+        
+        
+    @reconnect_if_expired
+    def _put_response(self,
+        url: str,
+        body: dict,
+        params: Optional[EdFiParams] = None
+    ) -> requests.Response:
+        response = self.client.session.put(url, json=body, params=params)
+        self.custom_raise_for_status(response)
+        return response
 
 
     @staticmethod
@@ -398,6 +421,19 @@ class EdFiResource(EdFiEndpoint):
             f"[Get Resource] Parameters: {self.params}"
         )
         return super().get(limit, **kwparams)
+    
+
+    def put(self, resourceId: str, body: dict) -> List[dict]:
+        """
+        This method returns the result of sending a put request to update a resource with the data specified by the user.
+
+        :return:
+        """
+        self.client.verbose_log(
+            f"[Put Resource] Endpoint : {self.url}/{resourceId}\n"
+            f"[Put Resource] Parameters: {self.params}"
+        )
+        return super().put(resourceId, body)
 
 
     def get_pages(self,

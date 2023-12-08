@@ -97,7 +97,8 @@ class EdFiEndpoint:
         if limit is not None:
             params['limit'] = limit
 
-        for key, value in kwparams.items():
+        adhoc_params = EdFiParams(**kwparams)
+        for key, value in adhoc_params.items():
             params[key] = value
 
         return self._get_response(self.url, params=params).json()
